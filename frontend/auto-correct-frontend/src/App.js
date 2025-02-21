@@ -1,47 +1,30 @@
 import React, { useState } from "react";
-import axios from "axios";
 
-function App() {
-    const [text, setText] = useState("");
-    const [correctedText, setCorrectedText] = useState("");
-    const [language, setLanguage] = useState("");
+const App = () => {
+    const [word, setWord] = useState("hello");
+    const [imageUrl, setImageUrl] = useState("");
 
-    const handleDetectLanguage = async () => {
-        try {
-            const response = await axios.post("http://127.0.0.1:8000/detect_language", { text });
-            setLanguage(response.data.detected_language);
-        } catch (error) {
-            console.error("Error detecting language:", error);
-        }
-    };
-
-    const handleCorrectText = async () => {
-        try {
-            const response = await axios.post("http://127.0.0.1:8000/correct_word", { text });
-            setCorrectedText(response.data.corrected_text);
-        } catch (error) {
-            console.error("Error correcting text:", error);
-        }
+    const fetchWordCloud = () => {
+        setImageUrl(`http://localhost:8000/wordcloud/${word}`);
     };
 
     return (
-        <div style={{ padding: "20px", maxWidth: "600px", margin: "auto" }}>
-            <h1>Multilingual Autocorrect</h1>
-            <textarea
-                rows="4"
-                cols="50"
-                placeholder="Type here..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
+        <div style={{ textAlign: "center", padding: "20px" }}>
+            <h1>Word Cloud for Typo Visualization</h1>
+            <input
+                type="text"
+                value={word}
+                onChange={(e) => setWord(e.target.value)}
+                placeholder="Enter a word"
+                style={{ padding: "10px", fontSize: "16px", marginBottom: "10px" }}
             />
-            <div>
-                <button onClick={handleDetectLanguage} style={{ margin: "5px" }}>Detect Language</button>
-                <button onClick={handleCorrectText} style={{ margin: "5px" }}>Correct Text</button>
-            </div>
-            {language && <h2>Detected Language: {language}</h2>}
-            {correctedText && <h2>Corrected Text: {correctedText}</h2>}
+            <button onClick={fetchWordCloud} style={{ padding: "10px 20px", fontSize: "16px" }}>
+                Generate Word Cloud
+            </button>
+            <br />
+            {imageUrl && <img src={imageUrl} alt="Word Cloud" style={{ marginTop: "20px", width: "80%" }} />}
         </div>
     );
-}
+};
 
 export default App;
