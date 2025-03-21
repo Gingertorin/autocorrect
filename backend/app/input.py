@@ -15,16 +15,16 @@ def get_keyboard():
             ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-']
         ],
 
-        # Shift layer (uppercase & shifted symbols, 1)
-        1: [
+        # Shift layer (One unit up)
+        2: [
             ['!', '"', '#', '¤', '%', '&', '/', '(', ')', '=', '?', '`'],
             ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Å', '^'],
             ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä', '*'],
             ['Z', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_']
         ],
 
-        # AltGr layer (symbols, now 2 instead of 1)
-        2: [
+        # AltGr layer (4 Units up)
+        10: [
             ['§', '@', '£', '$', '€', '{', '[', ']', '}', '\\', '|', '~'],
             ['q', 'w', '€', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'å', '¨'],  # Only '€' differs
             ['ä', 'ß', 'ð', 'đ', 'ŋ', 'ħ', 'j', 'ĸ', 'ł', 'ö', 'ä', "'"],  # Special letters
@@ -35,7 +35,7 @@ def get_keyboard():
     # Map each key to its (row, col, layer) coordinates
     keyboard_mapping = {}
 
-    for layer in [0, 1, 2]:  # Iterate over base, shift, and AltGr layers
+    for layer in swedish_keyboard_layout.keys():
         for row_idx, row in enumerate(swedish_keyboard_layout[layer]):
             for col_idx, key in enumerate(row):
                 keyboard_mapping[key] = (row_idx, col_idx, layer)
@@ -52,21 +52,17 @@ def key_distance(k1, k2, shift_weight=5, altgr_weight=30):
     """
 
     keyboard_mapping = KEYBOARD_MAPPING
+    
+
     if k1 in keyboard_mapping and k2 in keyboard_mapping:
         x1, y1, l1 = keyboard_mapping[k1]
         x2, y2, l2 = keyboard_mapping[k2]
         
-        # Adjust layer distance weight: Shift (1), AltGr (2)
+        # Adjust layer distance weight
         layer_distance = abs(l1 - l2)
-        if layer_distance == 1:  # Shift key switch
-            layer_penalty = shift_weight
-        elif layer_distance == 2:  # AltGr key switch (more costly)
-            layer_penalty = altgr_weight
-        else:
-            layer_penalty = 0
         
-        # Euclidean distance with layer penalty
-        return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2) + layer_penalty
+        # Euclidean distance
+        return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2 + (l1 - l2) ** 2)
 
     return float('inf')  # Large distance for non-existent keys
 
